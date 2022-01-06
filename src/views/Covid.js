@@ -6,21 +6,25 @@ import moment from 'moment';
 const Covid = () => {
 
     const [dataCovid, setDataCovid] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     //componentDidMount
     useEffect(() => {
-        async function fetchData() {
-            let res = await axios.get('https://api.covid19api.com/country/vietnam?from=2021-10-01T00:00:00Z&to=2021-10-20T00:00:00Z')
-            let data = res && res.data ? res.data : [];
-            if (data && data.length > 0) {
-                data.map(item => {
-                    item.Date = moment(item.Date).format('DD/MM/YYYY')
-                    return item
-                })
+        setTimeout(async () => {
+            async function fetchData() {
+                let res = await axios.get('https://api.covid19api.com/country/vietnam?from=2021-10-01T00:00:00Z&to=2021-10-20T00:00:00Z')
+                let data = res && res.data ? res.data : [];
+                if (data && data.length > 0) {
+                    data.map(item => {
+                        item.Date = moment(item.Date).format('DD/MM/YYYY')
+                        return item
+                    })
+                }
+                setDataCovid(data)
             }
-            setDataCovid(data)
-        }
-        fetchData()
+            fetchData()
+            setLoading(false)
+        }, 3000)
 
     }, [])
 
@@ -38,7 +42,7 @@ const Covid = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {dataCovid && dataCovid.length > 0 &&
+                    {loading === false && dataCovid && dataCovid.length > 0 &&
                         dataCovid.map(item => {
                             return (
                                 <tr key={item.ID}>
@@ -50,6 +54,12 @@ const Covid = () => {
                                 </tr>
                             )
                         })}
+
+                    {loading === true &&
+                        <tr>
+                            <td className="loading" colSpan="5">Loading...</td>
+                        </tr>
+                    }
 
                 </tbody>
 
